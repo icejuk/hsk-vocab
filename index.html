@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>คำศัพท์จีน HSK 1–2</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="description" content="คำศัพท์ภาษาจีน HSK 1–2 พร้อมพินอิน คำอ่านไทย คำแปล และปุ่มออกเสียง">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HSK 1–2">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Noto+Sans+Thai:wght@300;400;600&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:      #1a1a2e;
+    --paper:    #f7f4ef;
+    --red:      #c0392b;
+    --red-soft: #f5e6e4;
+    --gold:     #b8860b;
+    --mist:     #e8e4dc;
+    --mid:      #7a7068;
+    --card-bg:  #ffffff;
+    --hsk1:     #c0392b;
+    --hsk2:     #2980b9;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans Thai', 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    padding: 2rem 1.5rem 1.6rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '汉';
+    position: absolute;
+    right: -0.2rem;
+    top: -1rem;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 9rem;
+    color: rgba(255,255,255,0.04);
+    pointer-events: none;
+    line-height: 1;
+  }
+  header h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.8rem;
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+  header p {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.82rem;
+    margin-top: 0.35rem;
+    font-weight: 300;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1.2rem 1.5rem;
+    background: var(--mist);
+    border-bottom: 1px solid #ddd8ce;
+    align-items: center;
+  }
+  .filter-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .filter-btn {
+    padding: 0.45rem 1rem;
+    border-radius: 20px;
+    border: 1.5px solid transparent;
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s;
+    background: #fff;
+    color: var(--mid);
+    border-color: #ccc7be;
+  }
+  .filter-btn.active-all  { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .filter-btn.active-hsk1 { background: var(--hsk1); color: #fff; border-color: var(--hsk1); }
+  .filter-btn.active-hsk2 { background: var(--hsk2); color: #fff; border-color: var(--hsk2); }
+
+  .count-label {
+    font-size: 0.78rem;
+    color: var(--mid);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    overflow-x: auto;
+    padding: 1.2rem 1.5rem 3rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  thead th {
+    background: var(--ink);
+    color: rgba(255,255,255,0.85);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-weight: 600;
+  }
+  thead th:nth-child(1) { width: 55px; text-align: center; }
+  thead th:nth-child(2) { width: 90px; }
+  thead th:nth-child(3) { width: 110px; }
+  thead th:nth-child(4) { }
+  thead th:nth-child(5) { width: 56px; text-align: center; }
+
+  tbody tr {
+    border-bottom: 1px solid #eee9e0;
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #faf8f4; }
+
+  td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+  }
+
+  /* level badge */
+  .level {
+    display: inline-block;
+    font-size: 0.67rem;
+    font-weight: 700;
+    padding: 0.18rem 0.5rem;
+    border-radius: 10px;
+    letter-spacing: 0.04em;
+  }
+  .level-1 { background: var(--red-soft); color: var(--red); }
+  .level-2 { background: #ddeef8; color: #1a6fa0; }
+
+  /* chinese character */
+  .hanzi {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  /* pinyin */
+  .pinyin {
+    font-size: 0.82rem;
+    color: var(--red);
+    letter-spacing: 0.03em;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+
+  /* thai */
+  .thai {
+    font-size: 0.88rem;
+    color: #333;
+    line-height: 1.4;
+  }
+  .category {
+    font-size: 0.68rem;
+    color: var(--mid);
+    margin-top: 0.15rem;
+  }
+
+  /* speak button */
+  .speak-btn {
+    background: none;
+    border: 1.5px solid var(--mist);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    margin: auto;
+    color: var(--red);
+  }
+  .speak-btn svg { width: 17px; height: 17px; }
+  .speak-btn:hover  { background: var(--red-soft); border-color: var(--red); }
+  .speak-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+  .speak-btn .wave { transition: opacity 0.15s; }
+  .speak-btn.active .wave { animation: wavePulse 0.8s ease-in-out infinite; }
+  .speak-btn.active .wave-2 { animation-delay: 0.15s; }
+  @keyframes wavePulse {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 1; }
+  }
+
+  /* no results */
+  .no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--mid);
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.4rem; }
+    .hanzi { font-size: 1.2rem; }
+    td { padding: 0.6rem 0.6rem; }
+    thead th { padding: 0.7rem 0.6rem; font-size: 0.65rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>คำศัพท์จีน HSK 1–2</h1>
+  <p>พินอิน · คำอ่าน · ออกเสียง · คำแปลภาษาไทย</p>
+</header>
+
+<div class="controls">
+  <div class="filter-group">
+    <button class="filter-btn active-all" data-level="all">ทั้งหมด</button>
+    <button class="filter-btn" data-level="1">HSK 1</button>
+    <button class="filter-btn" data-level="2">HSK 2</button>
+  </div>
+  <span class="count-label" id="countLabel"></span>
+</div>
+
+<div class="table-wrap">
+  <table id="vocabTable">
+    <thead>
+      <tr>
+        <th>ระดับ</th>
+        <th>อักษร</th>
+        <th>พินอิน</th>
+        <th>ความหมาย (ไทย)</th>
+        <th>เสียง</th>
+      </tr>
+    </thead>
+    <tbody id="vocabBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults">ไม่พบคำศัพท์ที่ตรงกัน</div>
+</div>
+
+<script>
+const vocab = [
+  // ── HSK 1 ──
+  { l:1, h:"爱",   p:"ài",         r:"อ้าย",      t:"รัก, ชอบ",              c:"กริยา" },
+  { l:1, h:"八",   p:"bā",         r:"ปา",        t:"แปด (8)",               c:"ตัวเลข" },
+  { l:1, h:"爸爸", p:"bàba",       r:"ป้าปา",     t:"พ่อ",                   c:"คำนาม" },
+  { l:1, h:"杯子", p:"bēizi",      r:"เปยจึ",     t:"แก้วน้ำ, ถ้วย",         c:"คำนาม" },
+  { l:1, h:"北京", p:"Běijīng",    r:"เป่ยจิง",   t:"ปักกิ่ง",               c:"ชื่อเฉพาะ" },
+  { l:1, h:"本",   p:"běn",        r:"เปิ่น",     t:"ลักษณนามสำหรับหนังสือ", c:"ลักษณนาม" },
+  { l:1, h:"不",   p:"bù",         r:"ปู้",        t:"ไม่",                   c:"วิเศษณ์" },
+  { l:1, h:"不客气",p:"bú kèqi",   r:"ปู้เค่อชี่", t:"ไม่เป็นไร (ตอบขอบคุณ)",c:"สำนวน" },
+  { l:1, h:"菜",   p:"cài",        r:"ฉ่าย",      t:"อาหาร, ผัก, กับข้าว",   c:"คำนาม" },
+  { l:1, h:"茶",   p:"chá",        r:"ฉา",        t:"ชา",                    c:"คำนาม" },
+  { l:1, h:"吃",   p:"chī",        r:"ชือ",       t:"กิน",                   c:"กริยา" },
+  { l:1, h:"出租车",p:"chūzūchē",  r:"ชูจูเชอ",   t:"แท็กซี่",               c:"คำนาม" },
+  { l:1, h:"打电话",p:"dǎ diànhuà",r:"ต่าเตี้ยนฮว้า","t":"โทรศัพท์",         c:"กริยา" },
+  { l:1, h:"大",   p:"dà",         r:"ต้า",       t:"ใหญ่",                  c:"คำคุณศัพท์" },
+  { l:1, h:"的",   p:"de",         r:"เดอ",       t:"อนุภาคเชื่อมความ (ของ)", c:"คำช่วย" },
+  { l:1, h:"点",   p:"diǎn",       r:"เตี่ยน",    t:"โมง, นาที, จุด",        c:"คำนาม/ลักษณนาม" },
+  { l:1, h:"电脑", p:"diànnǎo",    r:"เตี้ยนเหน่า", t:"คอมพิวเตอร์",         c:"คำนาม" },
+  { l:1, h:"电视", p:"diànshì",    r:"เตี้ยนซื่อ", t:"โทรทัศน์",             c:"คำนาม" },
+  { l:1, h:"电影", p:"diànyǐng",   r:"เตี้ยนอิ่ง", t:"ภาพยนตร์",             c:"คำนาม" },
+  { l:1, h:"东西", p:"dōngxi",     r:"ตงซี",      t:"ของ, สิ่งของ",          c:"คำนาม" },
+  { l:1, h:"都",   p:"dōu",        r:"โตว",       t:"ทั้งหมด, ล้วน",        c:"วิเศษณ์" },
+  { l:1, h:"读",   p:"dú",         r:"ตู๋",        t:"อ่าน",                  c:"กริยา" },
+  { l:1, h:"对不起",p:"duìbuqǐ",   r:"ตุ้ยปู้ชี่", t:"ขอโทษ",                c:"สำนวน" },
+  { l:1, h:"多",   p:"duō",        r:"ตัว",       t:"มาก",                   c:"คำคุณศัพท์" },
+  { l:1, h:"多少", p:"duōshǎo",    r:"ตัวเส่า",   t:"เท่าไหร่",              c:"คำสรรพนาม" },
+  { l:1, h:"儿子", p:"érzi",       r:"เอ๋อร์จึ",   t:"ลูกชาย",               c:"คำนาม" },
+  { l:1, h:"二",   p:"èr",         r:"เอ้อร์",    t:"สอง (2)",               c:"ตัวเลข" },
+  { l:1, h:"饭店", p:"fàndiàn",    r:"ฝั้นเตี้ยน", t:"โรงแรม, ภัตตาคาร",     c:"คำนาม" },
+  { l:1, h:"飞机", p:"fēijī",      r:"เฟยจี",     t:"เครื่องบิน",            c:"คำนาม" },
+  { l:1, h:"分钟", p:"fēnzhōng",   r:"เฟินจง",    t:"นาที",                  c:"คำนาม" },
+  { l:1, h:"高兴", p:"gāoxìng",    r:"เก้าซิ่ง",  t:"ดีใจ, ยินดี",           c:"คำคุณศัพท์" },
+  { l:1, h:"个",   p:"gè",         r:"เกอ",       t:"อัน, คน (ลักษณนาม)",   c:"ลักษณนาม" },
+  { l:1, h:"工作", p:"gōngzuò",    r:"กงจั้ว",    t:"ทำงาน, งาน",            c:"กริยา/คำนาม" },
+  { l:1, h:"狗",   p:"gǒu",        r:"โก่ว",      t:"สุนัข",                 c:"คำนาม" },
+  { l:1, h:"汉语", p:"Hànyǔ",      r:"ฮั้นอวี่",   t:"ภาษาจีน",              c:"คำนาม" },
+  { l:1, h:"好",   p:"hǎo",        r:"เห่า",      t:"ดี",                    c:"คำคุณศัพท์" },
+  { l:1, h:"号",   p:"hào",        r:"เฮ้า",      t:"วันที่, หมายเลข",       c:"คำนาม" },
+  { l:1, h:"喝",   p:"hē",         r:"เฮอ",       t:"ดื่ม",                  c:"กริยา" },
+  { l:1, h:"和",   p:"hé",         r:"เหอ",       t:"และ, กับ",              c:"คำเชื่อม" },
+  { l:1, h:"很",   p:"hěn",        r:"เหิ่น",     t:"มาก, ค่อนข้าง",        c:"วิเศษณ์" },
+  { l:1, h:"后面", p:"hòumiàn",    r:"โฮ้วเมี่ยน", t:"ด้านหลัง",             c:"คำนาม" },
+  { l:1, h:"回",   p:"huí",        r:"หุย",       t:"กลับ",                  c:"กริยา" },
+  { l:1, h:"会",   p:"huì",        r:"ฮุ้ย",       t:"สามารถ, รู้วิธี",       c:"กริยา" },
+  { l:1, h:"几",   p:"jǐ",         r:"จี่",        t:"กี่, สักหน่อย",         c:"คำสรรพนาม" },
+  { l:1, h:"家",   p:"jiā",        r:"เจีย",      t:"บ้าน, ครอบครัว",        c:"คำนาม" },
+  { l:1, h:"叫",   p:"jiào",       r:"เจี้ยว",    t:"ชื่อ, เรียก",           c:"กริยา" },
+  { l:1, h:"今天", p:"jīntiān",    r:"จินเทียน",  t:"วันนี้",                c:"คำนาม" },
+  { l:1, h:"九",   p:"jiǔ",        r:"จิ่ว",      t:"เก้า (9)",              c:"ตัวเลข" },
+  { l:1, h:"开",   p:"kāi",        r:"ไค",        t:"เปิด, ขับ",             c:"กริยา" },
+  { l:1, h:"看",   p:"kàn",        r:"ค่าน",      t:"ดู, มอง, อ่าน",        c:"กริยา" },
+  { l:1, h:"块",   p:"kuài",       r:"ไคว่",      t:"เหรียญ (元) (ภาษาพูด)", c:"ลักษณนาม" },
+  { l:1, h:"来",   p:"lái",        r:"ไหล",       t:"มา",                    c:"กริยา" },
+  { l:1, h:"老师", p:"lǎoshī",     r:"เหล่าซือ",  t:"ครู, อาจารย์",          c:"คำนาม" },
+  { l:1, h:"了",   p:"le",         r:"เลอ",       t:"อนุภาคบอกการกระทำสำเร็จ",c:"คำช่วย" },
+  { l:1, h:"里",   p:"lǐ",         r:"หลี่",       t:"ใน, ข้างใน",            c:"คำบุพบท" },
+  { l:1, h:"六",   p:"liù",        r:"หลิ่ว",     t:"หก (6)",                c:"ตัวเลข" },
+  { l:1, h:"妈妈", p:"māma",       r:"มามา",      t:"แม่",                   c:"คำนาม" },
+  { l:1, h:"吗",   p:"ma",         r:"มา",        t:"อนุภาคคำถาม",           c:"คำช่วย" },
+  { l:1, h:"买",   p:"mǎi",        r:"ไหม่",      t:"ซื้อ",                  c:"กริยา" },
+  { l:1, h:"猫",   p:"māo",        r:"เมา",       t:"แมว",                   c:"คำนาม" },
+  { l:1, h:"没关系",p:"méi guānxi","r":"เหมยกวานซี","t":"ไม่เป็นไร",           c:"สำนวน" },
+  { l:1, h:"没有", p:"méiyǒu",     r:"เหมยโหย่ว", t:"ไม่มี",                 c:"กริยา" },
+  { l:1, h:"米饭", p:"mǐfàn",      r:"หมี่ฝั้น",  t:"ข้าวสวย",              c:"คำนาม" },
+  { l:1, h:"明天", p:"míngtiān",   r:"หมิงเทียน", t:"พรุ่งนี้",              c:"คำนาม" },
+  { l:1, h:"名字", p:"míngzi",     r:"หมิงจึ",    t:"ชื่อ",                  c:"คำนาม" },
+  { l:1, h:"哪",   p:"nǎ",         r:"หน่า",      t:"ที่ไหน, อันไหน",        c:"คำสรรพนาม" },
+  { l:1, h:"那",   p:"nà",         r:"น้า",       t:"นั้น, โน้น",            c:"คำนาม" },
+  { l:1, h:"呢",   p:"ne",         r:"เนอ",       t:"อนุภาคถาม/เชื่อม",     c:"คำช่วย" },
+  { l:1, h:"能",   p:"néng",       r:"เหนิง",     t:"สามารถ (ทางกายภาพ)",   c:"กริยา" },
+  { l:1, h:"你",   p:"nǐ",         r:"หนี่",      t:"คุณ, เธอ",              c:"คำสรรพนาม" },
+  { l:1, h:"年",   p:"nián",       r:"เนียน",     t:"ปี",                    c:"คำนาม" },
+  { l:1, h:"女儿", p:"nǚér",       r:"หนวี่เอ๋อร์", t:"ลูกสาว",              c:"คำนาม" },
+  { l:1, h:"朋友", p:"péngyou",    r:"เผิงโหยว",  t:"เพื่อน",                c:"คำนาม" },
+  { l:1, h:"漂亮", p:"piàoliang",  r:"เพี้ยวเลี่ยง","t":"สวย, หล่อ",          c:"คำคุณศัพท์" },
+  { l:1, h:"苹果", p:"píngguǒ",    r:"ผิงกั่ว",   t:"แอปเปิ้ล",             c:"คำนาม" },
+  { l:1, h:"七",   p:"qī",         r:"ชี",        t:"เจ็ด (7)",              c:"ตัวเลข" },
+  { l:1, h:"钱",   p:"qián",       r:"เชี่ยน",    t:"เงิน",                  c:"คำนาม" },
+  { l:1, h:"前面", p:"qiánmiàn",   r:"เชียนเมี่ยน","t":"ด้านหน้า",            c:"คำนาม" },
+  { l:1, h:"请",   p:"qǐng",       r:"ชิ่ง",      t:"กรุณา, เชิญ",           c:"กริยา" },
+  { l:1, h:"去",   p:"qù",         r:"ชวี่",      t:"ไป",                    c:"กริยา" },
+  { l:1, h:"热",   p:"rè",         r:"เร่อ",      t:"ร้อน",                  c:"คำคุณศัพท์" },
+  { l:1, h:"人",   p:"rén",        r:"เหริน",     t:"คน, มนุษย์",            c:"คำนาม" },
+  { l:1, h:"认识", p:"rènshi",     r:"เริ่นซือ",  t:"รู้จัก",                c:"กริยา" },
+  { l:1, h:"日",   p:"rì",         r:"ยื่อ",      t:"วัน (ในปฏิทิน)",        c:"คำนาม" },
+  { l:1, h:"三",   p:"sān",        r:"ซาน",       t:"สาม (3)",               c:"ตัวเลข" },
+  { l:1, h:"商店", p:"shāngdiàn",  r:"ซางเตี้ยน",  t:"ร้านค้า",               c:"คำนาม" },
+  { l:1, h:"上",   p:"shàng",      r:"ซ่าง",      t:"บน, ขึ้น",              c:"คำบุพบท" },
+  { l:1, h:"上午", p:"shàngwǔ",    r:"ซ่างอู่",    t:"ตอนเช้า (ก่อนเที่ยง)", c:"คำนาม" },
+  { l:1, h:"少",   p:"shǎo",       r:"เส่า",      t:"น้อย",                  c:"คำคุณศัพท์" },
+  { l:1, h:"谁",   p:"shéi",       r:"เซย",       t:"ใคร",                   c:"คำสรรพนาม" },
+  { l:1, h:"什么", p:"shénme",     r:"เซิ๋นเมอ",  t:"อะไร",                  c:"คำสรรพนาม" },
+  { l:1, h:"十",   p:"shí",        r:"ซือ",       t:"สิบ (10)",              c:"ตัวเลข" },
+  { l:1, h:"时候", p:"shíhou",     r:"ซือโหว",    t:"เวลา, ตอนที่",          c:"คำนาม" },
+  { l:1, h:"是",   p:"shì",        r:"ซื่อ",      t:"เป็น, คือ",             c:"กริยา" },
+  { l:1, h:"书",   p:"shū",        r:"ซู",        t:"หนังสือ",               c:"คำนาม" },
+  { l:1, h:"水",   p:"shuǐ",       r:"ซุ่ย",      t:"น้ำ",                   c:"คำนาม" },
+  { l:1, h:"水果", p:"shuǐguǒ",    r:"ซุ่ยกั่ว",  t:"ผลไม้",                 c:"คำนาม" },
+  { l:1, h:"睡觉", p:"shuìjiào",   r:"ซุ้ยเจี้ยว", t:"นอนหลับ",              c:"กริยา" },
+  { l:1, h:"说",   p:"shuō",       r:"ซัว",       t:"พูด, บอก",              c:"กริยา" },
+  { l:1, h:"四",   p:"sì",         r:"ซื่อ",      t:"สี่ (4)",               c:"ตัวเลข" },
+  { l:1, h:"岁",   p:"suì",        r:"ซุ้ย",      t:"อายุ (ปี), ขวบ",       c:"คำนาม" },
+  { l:1, h:"他",   p:"tā",         r:"ทา",        t:"เขา (ชาย)",             c:"คำสรรพนาม" },
+  { l:1, h:"她",   p:"tā",         r:"ทา",        t:"เธอ (หญิง)",            c:"คำสรรพนาม" },
+  { l:1, h:"太",   p:"tài",        r:"ไท่",       t:"เกินไป",                c:"วิเศษณ์" },
+  { l:1, h:"天气", p:"tiānqì",     r:"เทียนชี่",  t:"สภาพอากาศ",             c:"คำนาม" },
+  { l:1, h:"听",   p:"tīng",       r:"ทิง",       t:"ฟัง",                   c:"กริยา" },
+  { l:1, h:"同学", p:"tóngxué",    r:"ถงเสวีย",   t:"เพื่อนร่วมชั้น",        c:"คำนาม" },
+  { l:1, h:"喂",   p:"wèi",        r:"เว้ย",      t:"ฮัลโหล (ทางโทรศัพท์)", c:"คำอุทาน" },
+  { l:1, h:"我",   p:"wǒ",         r:"หว่อ",      t:"ฉัน, ผม",              c:"คำสรรพนาม" },
+  { l:1, h:"我们", p:"wǒmen",      r:"หว่อเหมิน", t:"พวกเรา",               c:"คำสรรพนาม" },
+  { l:1, h:"五",   p:"wǔ",         r:"อู่",        t:"ห้า (5)",               c:"ตัวเลข" },
+  { l:1, h:"下",   p:"xià",        r:"เซี่ย",     t:"ล่าง, ลง",              c:"คำบุพบท" },
+  { l:1, h:"下午", p:"xiàwǔ",      r:"เซี่ยอู่",   t:"ตอนบ่าย",              c:"คำนาม" },
+  { l:1, h:"下雨", p:"xià yǔ",     r:"เซี่ยอวี่",  t:"ฝนตก",                 c:"กริยา" },
+  { l:1, h:"先生", p:"xiānsheng",  r:"เซียนเซิง",  t:"ท่าน, นาย",            c:"คำนาม" },
+  { l:1, h:"现在", p:"xiànzài",    r:"เซี่ยนไจ้",  t:"ตอนนี้",               c:"คำนาม" },
+  { l:1, h:"想",   p:"xiǎng",      r:"เซี่ยง",    t:"คิด, อยากจะ",           c:"กริยา" },
+  { l:1, h:"小",   p:"xiǎo",       r:"เสี่ยว",    t:"เล็ก",                  c:"คำคุณศัพท์" },
+  { l:1, h:"小姐", p:"xiǎojiě",    r:"เสี่ยวเจีย", t:"คุณหนู, นางสาว",       c:"คำนาม" },
+  { l:1, h:"些",   p:"xiē",        r:"เซีย",      t:"บางส่วน, หลายอย่าง",   c:"ลักษณนาม" },
+  { l:1, h:"写",   p:"xiě",        r:"เซี่ย",     t:"เขียน",                 c:"กริยา" },
+  { l:1, h:"谢谢", p:"xièxie",     r:"เซี่ยเซีย", t:"ขอบคุณ",               c:"สำนวน" },
+  { l:1, h:"星期", p:"xīngqī",     r:"ซิงชี",     t:"สัปดาห์, วันใน ส.",    c:"คำนาม" },
+  { l:1, h:"学生", p:"xuésheng",   r:"เสวียเซิง",  t:"นักเรียน",             c:"คำนาม" },
+  { l:1, h:"学习", p:"xuéxí",      r:"เสวียซี",   t:"เรียน, ศึกษา",          c:"กริยา" },
+  { l:1, h:"学校", p:"xuéxiào",    r:"เสวียเซี่ยว","t":"โรงเรียน",            c:"คำนาม" },
+  { l:1, h:"一",   p:"yī",         r:"อี",        t:"หนึ่ง (1)",             c:"ตัวเลข" },
+  { l:1, h:"医生", p:"yīshēng",    r:"อีเซิง",    t:"แพทย์, หมอ",            c:"คำนาม" },
+  { l:1, h:"医院", p:"yīyuàn",     r:"อียวน",     t:"โรงพยาบาล",            c:"คำนาม" },
+  { l:1, h:"椅子", p:"yǐzi",       r:"อี่จึ",     t:"เก้าอี้",               c:"คำนาม" },
+  { l:1, h:"有",   p:"yǒu",        r:"โหย่ว",     t:"มี",                    c:"กริยา" },
+  { l:1, h:"月",   p:"yuè",        r:"เยว่",      t:"เดือน, ดวงจันทร์",     c:"คำนาม" },
+  { l:1, h:"在",   p:"zài",        r:"ไจ้",       t:"อยู่ที่, กำลัง",        c:"กริยา/คำบุพบท" },
+  { l:1, h:"再见", p:"zàijiàn",    r:"ไจ้เจี้ยน",  t:"ลาก่อน",              c:"สำนวน" },
+  { l:1, h:"怎么", p:"zěnme",      r:"เจิ้นเมอ",  t:"อย่างไร, ยังไง",       c:"คำสรรพนาม" },
+  { l:1, h:"怎么样",p:"zěnmeyàng", r:"เจิ้นเมอหยาง","t":"เป็นอย่างไร",       c:"คำสรรพนาม" },
+  { l:1, h:"这",   p:"zhè",        r:"เจ้อ",      t:"นี้",                   c:"คำสรรพนาม" },
+  { l:1, h:"中国", p:"Zhōngguó",   r:"จงกั๋ว",    t:"จีน, ประเทศจีน",       c:"ชื่อเฉพาะ" },
+  { l:1, h:"中午", p:"zhōngwǔ",    r:"จงอู่",     t:"เที่ยงวัน",             c:"คำนาม" },
+  { l:1, h:"住",   p:"zhù",        r:"จู้",        t:"อาศัยอยู่",             c:"กริยา" },
+  { l:1, h:"桌子", p:"zhuōzi",     r:"จัวจึ",     t:"โต๊ะ",                  c:"คำนาม" },
+  { l:1, h:"字",   p:"zì",         r:"จึ้",        t:"ตัวอักษร, อักขระ",     c:"คำนาม" },
+  { l:1, h:"坐",   p:"zuò",        r:"จั้ว",      t:"นั่ง",                  c:"กริยา" },
+  { l:1, h:"昨天", p:"zuótiān",    r:"จั้วเทียน",  t:"เมื่อวาน",              c:"คำนาม" },
+
+  // ── HSK 2 ──
+  { l:2, h:"啊",   p:"a",          r:"อา",        t:"อนุภาคเน้นย้ำ, อ้าว",  c:"คำช่วย" },
+  { l:2, h:"白",   p:"bái",        r:"ไป๋",       t:"ขาว",                   c:"คำคุณศัพท์" },
+  { l:2, h:"百",   p:"bǎi",        r:"ไป่",       t:"ร้อย (100)",            c:"ตัวเลข" },
+  { l:2, h:"帮助", p:"bāngzhù",    r:"ปังจู้",    t:"ช่วยเหลือ",             c:"กริยา/คำนาม" },
+  { l:2, h:"报纸", p:"bàozhǐ",     r:"เปาจื่อ",   t:"หนังสือพิมพ์",          c:"คำนาม" },
+  { l:2, h:"比",   p:"bǐ",         r:"ปี่",        t:"เปรียบเทียบกับ",        c:"คำบุพบท" },
+  { l:2, h:"别",   p:"bié",        r:"เปี๋ย",     t:"อย่า",                  c:"วิเศษณ์" },
+  { l:2, h:"宾馆", p:"bīnguǎn",    r:"ปินกว่าน",  t:"โรงแรม",               c:"คำนาม" },
+  { l:2, h:"长",   p:"cháng",      r:"ฉาง",       t:"ยาว",                   c:"คำคุณศัพท์" },
+  { l:2, h:"唱歌", p:"chàng gē",   r:"ชั่งเกอ",   t:"ร้องเพลง",              c:"กริยา" },
+  { l:2, h:"出",   p:"chū",        r:"ชู",        t:"ออกไป",                 c:"กริยา" },
+  { l:2, h:"穿",   p:"chuān",      r:"ชวน",       t:"สวม, ใส่ (เสื้อผ้า)",   c:"กริยา" },
+  { l:2, h:"次",   p:"cì",         r:"ชื่อ",      t:"ครั้ง (ลักษณนาม)",     c:"ลักษณนาม" },
+  { l:2, h:"从",   p:"cóng",       r:"ฉง",        t:"จาก",                   c:"คำบุพบท" },
+  { l:2, h:"错",   p:"cuò",        r:"ชั้ว",      t:"ผิด, ผิดพลาด",          c:"คำคุณศัพท์" },
+  { l:2, h:"打篮球",p:"dǎ lánqiú", r:"ต่าหลันชิ่ว","t":"เล่นบาสเกตบอล",      c:"กริยา" },
+  { l:2, h:"大家", p:"dàjiā",      r:"ต้าเจีย",   t:"ทุกคน",                 c:"คำสรรพนาม" },
+  { l:2, h:"到",   p:"dào",        r:"ต้าว",      t:"ถึง, ไปถึง",            c:"กริยา" },
+  { l:2, h:"地方", p:"dìfang",     r:"ตี้ฝาง",    t:"สถานที่",               c:"คำนาม" },
+  { l:2, h:"弟弟", p:"dìdi",       r:"ตี้ตี",     t:"น้องชาย",               c:"คำนาม" },
+  { l:2, h:"第一", p:"dì yī",      r:"ตี้อี",     t:"ที่หนึ่ง, อันดับแรก",  c:"คำคุณศัพท์" },
+  { l:2, h:"懂",   p:"dǒng",       r:"ต่ง",       t:"เข้าใจ",                c:"กริยา" },
+  { l:2, h:"对",   p:"duì",        r:"ตุ้ย",      t:"ถูกต้อง, ต่อ",          c:"คำคุณศัพท์" },
+  { l:2, h:"房间", p:"fángjiān",   r:"ฝางเจียน",  t:"ห้อง",                  c:"คำนาม" },
+  { l:2, h:"非常", p:"fēicháng",   r:"เฟยฉาง",    t:"ที่สุด, มากมาย",        c:"วิเศษณ์" },
+  { l:2, h:"服务员",p:"fúwùyuán",  r:"ฝู้อู้หยวน", t:"พนักงาน, เซิร์ฟเวอร์", c:"คำนาม" },
+  { l:2, h:"复习", p:"fùxí",       r:"ฝู้ซี",     t:"ทบทวน",                 c:"กริยา" },
+  { l:2, h:"告诉", p:"gàosu",      r:"เก้าซู",    t:"บอก, แจ้ง",             c:"กริยา" },
+  { l:2, h:"哥哥", p:"gēge",       r:"เกอเกอ",    t:"พี่ชาย",                c:"คำนาม" },
+  { l:2, h:"给",   p:"gěi",        r:"เก่ย",      t:"ให้",                   c:"กริยา/คำบุพบท" },
+  { l:2, h:"公共汽车",p:"gōnggòng qìchē","r":"กงก้งชี่เชอ","t":"รถโดยสาร, รถเมล์",c:"คำนาม" },
+  { l:2, h:"公司", p:"gōngsī",     r:"กงซือ",     t:"บริษัท",                c:"คำนาม" },
+  { l:2, h:"贵",   p:"guì",        r:"กุ้ย",      t:"แพง",                   c:"คำคุณศัพท์" },
+  { l:2, h:"过",   p:"guò",        r:"กั้ว",      t:"ผ่าน, เคย",             c:"กริยา" },
+  { l:2, h:"还",   p:"hái",        r:"ไห",        t:"ยังคง, อีก",            c:"วิเศษณ์" },
+  { l:2, h:"黑",   p:"hēi",        r:"เฮย",       t:"ดำ",                    c:"คำคุณศัพท์" },
+  { l:2, h:"红",   p:"hóng",       r:"หง",        t:"แดง",                   c:"คำคุณศัพท์" },
+  { l:2, h:"欢迎", p:"huānyíng",   r:"ฮวนอิง",    t:"ยินดีต้อนรับ",          c:"กริยา" },
+  { l:2, h:"还是", p:"háishi",     r:"ไห่ซือ",    t:"หรือว่า, ยังคง",        c:"คำเชื่อม" },
+  { l:2, h:"火车站",p:"huǒchēzhàn","r":"ฮั่วเชอจ้าน","t":"สถานีรถไฟ",          c:"คำนาม" },
+  { l:2, h:"机场", p:"jīchǎng",    r:"จีฉ่าง",    t:"สนามบิน",               c:"คำนาม" },
+  { l:2, h:"鸡蛋", p:"jīdàn",      r:"จีต้าน",    t:"ไข่ไก่",                c:"คำนาม" },
+  { l:2, h:"件",   p:"jiàn",       r:"เจี้ยน",    t:"ลักษณนามสำหรับเสื้อผ้า",c:"ลักษณนาม" },
+  { l:2, h:"教",   p:"jiāo",       r:"เจียว",     t:"สอน",                   c:"กริยา" },
+  { l:2, h:"姐姐", p:"jiějie",     r:"เจี่ยเจีย",  t:"พี่สาว",               c:"คำนาม" },
+  { l:2, h:"介绍", p:"jièshào",    r:"เจี้ยเส้า",  t:"แนะนำ",                c:"กริยา" },
+  { l:2, h:"进",   p:"jìn",        r:"จิ้น",      t:"เข้าไป",                c:"กริยา" },
+  { l:2, h:"就",   p:"jiù",        r:"จิ้ว",      t:"ก็, แล้ว, แค่",        c:"วิเศษณ์" },
+  { l:2, h:"觉得", p:"juéde",      r:"เจว๋เดอ",   t:"รู้สึก, คิดว่า",        c:"กริยา" },
+  { l:2, h:"咖啡", p:"kāfēi",      r:"คาเฟย",     t:"กาแฟ",                  c:"คำนาม" },
+  { l:2, h:"开始", p:"kāishǐ",     r:"ไคซื่อ",    t:"เริ่ม",                 c:"กริยา" },
+  { l:2, h:"考试", p:"kǎoshì",     r:"เข่าซื่อ",  t:"สอบ",                   c:"กริยา/คำนาม" },
+  { l:2, h:"可能", p:"kěnéng",     r:"เขิ่นเหนิง", t:"อาจจะ",                c:"วิเศษณ์" },
+  { l:2, h:"可以", p:"kěyǐ",       r:"เขิ่ยี่",   t:"ได้, อนุญาต",           c:"กริยา" },
+  { l:2, h:"课",   p:"kè",         r:"เค่อ",      t:"บทเรียน, ชั้นเรียน",    c:"คำนาม" },
+  { l:2, h:"快",   p:"kuài",       r:"ไค่",       t:"เร็ว",                  c:"คำคุณศัพท์" },
+  { l:2, h:"快乐", p:"kuàilè",     r:"ไค่เล่อ",   t:"มีความสุข",             c:"คำคุณศัพท์" },
+  { l:2, h:"累",   p:"lèi",        r:"เล้ย",      t:"เหนื่อย",               c:"คำคุณศัพท์" },
+  { l:2, h:"离",   p:"lí",         r:"หลี",       t:"ห่างจาก",               c:"คำบุพบท" },
+  { l:2, h:"两",   p:"liǎng",      r:"เหลี่ยง",   t:"สอง (บอกปริมาณ)",      c:"ตัวเลข" },
+  { l:2, h:"零",   p:"líng",       r:"หลิง",      t:"ศูนย์ (0)",             c:"ตัวเลข" },
+  { l:2, h:"路",   p:"lù",         r:"ลู่",        t:"ถนน, เส้นทาง",          c:"คำนาม" },
+  { l:2, h:"旅游", p:"lǚyóu",      r:"หลวี่โหยว",  t:"ท่องเที่ยว",            c:"กริยา/คำนาม" },
+  { l:2, h:"卖",   p:"mài",        r:"ไม้",       t:"ขาย",                   c:"กริยา" },
+  { l:2, h:"慢",   p:"màn",        r:"ม่าน",      t:"ช้า",                   c:"คำคุณศัพท์" },
+  { l:2, h:"忙",   p:"máng",       r:"มาง",       t:"ยุ่ง",                  c:"คำคุณศัพท์" },
+  { l:2, h:"每",   p:"měi",        r:"เหม่ย",     t:"ทุก, แต่ละ",            c:"คำวิเศษณ์นาม" },
+  { l:2, h:"妹妹", p:"mèimei",     r:"เม้ยเมย",   t:"น้องสาว",               c:"คำนาม" },
+  { l:2, h:"男",   p:"nán",        r:"หนาน",      t:"ชาย",                   c:"คำคุณศัพท์" },
+  { l:2, h:"您",   p:"nín",        r:"หนิน",      t:"ท่าน (ยกย่อง)",         c:"คำสรรพนาม" },
+  { l:2, h:"努力", p:"nǔlì",       r:"หนู่หลี่",   t:"พยายาม, ขยัน",         c:"กริยา/คำคุณศัพท์" },
+  { l:2, h:"旁边", p:"pángbiān",   r:"ผางเปียน",  t:"ข้างๆ, ด้านข้าง",      c:"คำนาม" },
+  { l:2, h:"跑步", p:"pǎobù",      r:"เผ่าปู้",   t:"วิ่ง, จ็อกกิ้ง",       c:"กริยา" },
+  { l:2, h:"便宜", p:"piányí",     r:"เพี้ยนอี",  t:"ถูก (ราคา)",            c:"คำคุณศัพท์" },
+  { l:2, h:"票",   p:"piào",       r:"เพี้ยว",    t:"ตั๋ว",                  c:"คำนาม" },
+  { l:2, h:"妻子", p:"qīzi",       r:"ชีจึ",      t:"ภรรยา",                 c:"คำนาม" },
+  { l:2, h:"起床", p:"qǐchuáng",   r:"ชี่ฉวง",    t:"ตื่นนอน",               c:"กริยา" },
+  { l:2, h:"千",   p:"qiān",       r:"เชียน",     t:"พัน (1,000)",           c:"ตัวเลข" },
+  { l:2, h:"铅笔", p:"qiānbǐ",     r:"เชียนปี่",  t:"ดินสอ",                 c:"คำนาม" },
+  { l:2, h:"晴",   p:"qíng",       r:"ชิง",       t:"ท้องฟ้าแจ่มใส",         c:"คำคุณศัพท์" },
+  { l:2, h:"让",   p:"ràng",       r:"รั่ง",      t:"ให้, ยอมให้",           c:"กริยา" },
+  { l:2, h:"日记", p:"rìjì",       r:"ยื่อจี้",   t:"ไดอารี่, บันทึกประจำวัน",c:"คำนาม" },
+  { l:2, h:"如果", p:"rúguǒ",      r:"หรูกั่ว",   t:"ถ้าหาก",               c:"คำเชื่อม" },
+  { l:2, h:"上班", p:"shàng bān",  r:"ซ่างปาน",   t:"ไปทำงาน",              c:"กริยา" },
+  { l:2, h:"身体", p:"shēntǐ",     r:"เซินที่",   t:"ร่างกาย, สุขภาพ",      c:"คำนาม" },
+  { l:2, h:"生病", p:"shēng bìng", r:"เซิงปิ้ง",  t:"เจ็บป่วย, ป่วย",       c:"กริยา" },
+  { l:2, h:"生日", p:"shēngrì",    r:"เซิงยื่อ",  t:"วันเกิด",               c:"คำนาม" },
+  { l:2, h:"时间", p:"shíjiān",    r:"ซือเจียน",  t:"เวลา",                  c:"คำนาม" },
+  { l:2, h:"事情", p:"shìqing",    r:"ซื่อชิง",   t:"เรื่อง, สิ่งของ",       c:"คำนาม" },
+  { l:2, h:"手机", p:"shǒujī",     r:"โส่วจี",    t:"โทรศัพท์มือถือ",        c:"คำนาม" },
+  { l:2, h:"送",   p:"sòng",       r:"ซ่ง",       t:"ส่ง, มอบ, พาไปส่ง",    c:"กริยา" },
+  { l:2, h:"虽然", p:"suīrán",     r:"ซุยราน",    t:"แม้ว่า, ทั้งๆ ที่",    c:"คำเชื่อม" },
+  { l:2, h:"它",   p:"tā",         r:"ทา",        t:"มัน (สัตว์/สิ่งของ)",   c:"คำสรรพนาม" },
+  { l:2, h:"踢足球",p:"tī zúqiú",  r:"ทีจู๋ชิ่ว",  t:"เล่นฟุตบอล",           c:"กริยา" },
+  { l:2, h:"题",   p:"tí",         r:"ที",        t:"คำถาม, ข้อสอบ",        c:"คำนาม" },
+  { l:2, h:"跳舞", p:"tiào wǔ",    r:"เที่ยวอู่",  t:"เต้นรำ",               c:"กริยา" },
+  { l:2, h:"外",   p:"wài",        r:"ไว่",       t:"นอก, ภายนอก",          c:"คำนาม" },
+  { l:2, h:"完",   p:"wán",        r:"หว่าน",     t:"เสร็จสิ้น",             c:"กริยา" },
+  { l:2, h:"玩",   p:"wán",        r:"หว่าน",     t:"เล่น",                  c:"กริยา" },
+  { l:2, h:"晚上", p:"wǎnshang",   r:"หว่านซ่าง",  t:"ตอนเย็น/กลางคืน",     c:"คำนาม" },
+  { l:2, h:"往",   p:"wǎng",       r:"หว่าง",     t:"ไปทาง",                 c:"คำบุพบท" },
+  { l:2, h:"为什么",p:"wèishénme", r:"เว้ยเซิ๋นเมอ","t":"ทำไม",               c:"คำสรรพนาม" },
+  { l:2, h:"问",   p:"wèn",        r:"เว้น",      t:"ถาม",                   c:"กริยา" },
+  { l:2, h:"问题", p:"wèntí",      r:"เว้นที",    t:"ปัญหา, คำถาม",          c:"คำนาม" },
+  { l:2, h:"希望", p:"xīwàng",     r:"ซีหวาง",    t:"หวังว่า, ความหวัง",     c:"กริยา/คำนาม" },
+  { l:2, h:"洗",   p:"xǐ",         r:"ซี่",        t:"ล้าง, ซัก",             c:"กริยา" },
+  { l:2, h:"先",   p:"xiān",       r:"เซียน",     t:"ก่อน",                  c:"วิเศษณ์" },
+  { l:2, h:"向",   p:"xiàng",      r:"เซี่ยง",    t:"ไปทาง, ต่อ",            c:"คำบุพบท" },
+  { l:2, h:"小时", p:"xiǎoshí",    r:"เสี่ยวซือ",  t:"ชั่วโมง",               c:"คำนาม" },
+  { l:2, h:"笑",   p:"xiào",       r:"เซี้ยว",    t:"ยิ้ม, หัวเราะ",        c:"กริยา" },
+  { l:2, h:"新",   p:"xīn",        r:"ซิน",       t:"ใหม่",                  c:"คำคุณศัพท์" },
+  { l:2, h:"姓",   p:"xìng",       r:"ซิ้ง",      t:"นามสกุล",               c:"กริยา/คำนาม" },
+  { l:2, h:"休息", p:"xiūxi",      r:"ซิวซี",     t:"พัก",                   c:"กริยา" },
+  { l:2, h:"需要", p:"xūyào",      r:"ซวียาว",    t:"ต้องการ",               c:"กริยา" },
+  { l:2, h:"选择", p:"xuǎnzé",     r:"เสวี่ยนเจ๋อ","t":"เลือก",               c:"กริยา/คำนาม" },
+  { l:2, h:"颜色", p:"yánsè",      r:"เหยี่ยนเซ่อ","t":"สี",                  c:"คำนาม" },
+  { l:2, h:"要",   p:"yào",        r:"เยา",       t:"ต้องการ, จะ",           c:"กริยา" },
+  { l:2, h:"也",   p:"yě",         r:"เย่",       t:"ก็, ด้วย",              c:"วิเศษณ์" },
+  { l:2, h:"一起", p:"yīqǐ",       r:"อีชี่",     t:"ด้วยกัน, พร้อมกัน",    c:"วิเศษณ์" },
+  { l:2, h:"已经", p:"yǐjīng",     r:"อี่จิง",    t:"แล้ว (เรียบร้อย)",      c:"วิเศษณ์" },
+  { l:2, h:"一共", p:"yīgòng",     r:"อีก้ง",     t:"รวมทั้งหมด",            c:"วิเศษณ์" },
+  { l:2, h:"音乐", p:"yīnyuè",     r:"อินเยว่",   t:"ดนตรี",                 c:"คำนาม" },
+  { l:2, h:"因为", p:"yīnwèi",     r:"อินเว้ย",   t:"เพราะว่า",              c:"คำเชื่อม" },
+  { l:2, h:"游泳", p:"yóuyǒng",    r:"โหยวยง",    t:"ว่ายน้ำ",               c:"กริยา" },
+  { l:2, h:"右边", p:"yòubiān",    r:"โหย่วเปียน", t:"ด้านขวา",              c:"คำนาม" },
+  { l:2, h:"鱼",   p:"yú",         r:"อวี่",       t:"ปลา",                   c:"คำนาม" },
+  { l:2, h:"远",   p:"yuǎn",       r:"ยวน",       t:"ไกล",                   c:"คำคุณศัพท์" },
+  { l:2, h:"运动", p:"yùndòng",    r:"ยวินต้ง",   t:"ออกกำลังกาย, กีฬา",    c:"กริยา/คำนาม" },
+  { l:2, h:"再",   p:"zài",        r:"ไจ้",       t:"อีกครั้ง",              c:"วิเศษณ์" },
+  { l:2, h:"早上", p:"zǎoshang",   r:"เจ่าซ่าง",  t:"เช้าตรู่",              c:"คำนาม" },
+  { l:2, h:"丈夫", p:"zhàngfu",    r:"จ้างฝู",    t:"สามี",                  c:"คำนาม" },
+  { l:2, h:"找",   p:"zhǎo",       r:"จ่าว",      t:"หา, ค้นหา",            c:"กริยา" },
+  { l:2, h:"着",   p:"zhe",        r:"เจอ",       t:"อนุภาคบอกกำลังกระทำ",  c:"คำช่วย" },
+  { l:2, h:"正在", p:"zhèngzài",   r:"เจิ้งไจ้",  t:"กำลัง (ทำอยู่ตอนนี้)", c:"วิเศษณ์" },
+  { l:2, h:"知道", p:"zhīdào",     r:"จือต้าว",   t:"รู้",                   c:"กริยา" },
+  { l:2, h:"准备", p:"zhǔnbèi",    r:"จุ้นเปย",   t:"เตรียม",                c:"กริยา" },
+  { l:2, h:"左边", p:"zuǒbiān",    r:"จั้วเปียน",  t:"ด้านซ้าย",             c:"คำนาม" },
+];
+
+let currentFilter = 'all';
+
+function speak(hanzi, ev) {
+  const btn = ev.currentTarget;
+  window.speechSynthesis.cancel();
+  // เคลียร์สถานะ active ของปุ่มอื่นก่อน กันค้างแดงเวลา cancel/onend ไม่ทำงาน
+  document.querySelectorAll('.speak-btn.active').forEach(b => b.classList.remove('active'));
+  const utter = new SpeechSynthesisUtterance(hanzi);
+  utter.lang = 'zh-CN';
+  utter.rate = 0.6;
+  utter.pitch = 1.1;
+
+  // เลือกเสียงผู้หญิงจีน
+  const voices = window.speechSynthesis.getVoices();
+  const femaleVoice = voices.find(v =>
+    v.lang.startsWith('zh') && /female|woman|Ting-Ting|Meijia|Sinji|Ya-Ling|Hanhan|Lili|Tingting/i.test(v.name)
+  ) || voices.find(v =>
+    v.lang.startsWith('zh')
+  );
+  if (femaleVoice) utter.voice = femaleVoice;
+
+  btn.classList.add('active');
+  const clear = () => btn.classList.remove('active');
+  utter.onend = clear;
+  utter.onerror = clear;
+  window.speechSynthesis.speak(utter);
+}
+
+// โหลดเสียงล่วงหน้า (Chrome โหลด async)
+window.speechSynthesis.getVoices();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('vocabBody');
+  const noRes = document.getElementById('noResults');
+  const filtered = vocab.filter(v =>
+    currentFilter === 'all' || v.l === parseInt(currentFilter)
+  );
+
+  document.getElementById('countLabel').textContent =
+    `แสดง ${filtered.length} / ${vocab.length} คำ`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    noRes.style.display = 'block';
+    return;
+  }
+  noRes.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(v => `
+    <tr>
+      <td style="text-align:center">
+        <span class="level level-${v.l}">HSK ${v.l}</span>
+      </td>
+      <td>
+        <div class="hanzi">${v.h}</div>
+      </td>
+      <td>
+        <div class="pinyin">${v.p}</div>
+        <div class="category" style="margin-top:2px;font-size:0.75rem;color:#b0a898">${v.r}</div>
+      </td>
+      <td>
+        <div class="thai">${v.t}</div>
+        <div class="category">${v.c}</div>
+      </td>
+      <td>
+        <button class="speak-btn" onclick="speak('${v.h}', event)" title="ฟังเสียง" aria-label="ฟังเสียง ${v.h}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path class="wave wave-1" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path class="wave wave-2" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentFilter = btn.dataset.level;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.className = 'filter-btn';
+    });
+    if (currentFilter === 'all') btn.classList.add('active-all');
+    else if (currentFilter === '1') btn.classList.add('active-hsk1');
+    else btn.classList.add('active-hsk2');
+    renderTable();
+  });
+});
+
+renderTable();
+</script>
+
+<script>
+  // ลงทะเบียน service worker เพื่อให้ติดตั้งเป็นแอป + ใช้ออฟไลน์ได้
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .catch(err => console.warn('SW registration failed:', err));
+    });
+  }
+</script>
+</body>
+</html>
