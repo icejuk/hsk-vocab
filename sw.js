@@ -1,6 +1,6 @@
 // Service worker for the HSK 1–2 vocab PWA.
 // Bump CACHE when you change any precached asset to force an update.
-const CACHE = 'hsk-vocab-v2';
+const CACHE = 'hsk-vocab-v3';
 
 // App shell — relative paths so it works on a GitHub Pages subpath.
 const ASSETS = [
